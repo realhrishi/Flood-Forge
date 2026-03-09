@@ -1,7 +1,6 @@
 Flood-Forge — AI Powered Flood Risk Prediction & Alert System
 
 Flood-Forge is an intelligent flood monitoring and prediction platform that combines machine learning, real-time weather data, and interactive visualization to detect potential flood risks and alert users early.
-
 The platform analyzes environmental and rainfall data to estimate flood probability for different locations and displays risk zones on a live map.
 
 🚀 Features
@@ -22,28 +21,8 @@ The platform analyzes environmental and rainfall data to estimate flood probabil
 
 📲 Notification support via Twilio
 
-🧠 System Architecture
-                Weather APIs
-                     │
-                     │
-              Data Collection
-                     │
-                     ▼
-             Feature Processing
-                     │
-                     ▼
-          Machine Learning Model
-        (Random Forest / XGBoost)
-                     │
-                     ▼
-           Flood Risk Prediction
-                     │
-          ┌──────────┴──────────┐
-          ▼                     ▼
-     Alert Generation      Risk Visualization
-          │                     │
-          ▼                     ▼
-     Twilio Notifications     React Dashboard
+<img width="714" height="466" alt="image" src="https://github.com/user-attachments/assets/a953393a-97c0-45fb-8a9e-eee903c9d96f" />
+
 🛠 Tech Stack
 Frontend
 
@@ -83,26 +62,8 @@ OpenWeather API (Weather Data)
 
 Twilio (Alert System)
 
-📂 Project Structure
-Flood-Forge
-│
-├── backend
-│   ├── routes
-│   ├── services
-│   ├── models
-│   ├── database
-│   ├── ml_model
-│   └── main.py
-│
-├── src
-│   ├── components
-│   ├── pages
-│   ├── services
-│
-├── public
-├── package.json
-├── vite.config.js
-└── README.md
+<img width="715" height="424" alt="image" src="https://github.com/user-attachments/assets/82c084c9-1bc0-4e67-a056-77854844551f" />
+
 ⚙️ Setup Instructions
 1️⃣ Clone the repository
 git clone https://github.com/realhrishi/Flood-Forge.git
