@@ -93,7 +93,8 @@ const FloodMap = () => {
 
       try {
 
-        const res = await fetch("http://localhost:8000/alerts/all");
+        const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+        const res = await fetch(`${BASE}/alerts/all`);
         const data = await res.json();
 
         const sorted = data.sort(

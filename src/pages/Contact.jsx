@@ -5,7 +5,7 @@ const team = [
   {
     name: "Hrishiraj Chowdhury",
     role: "Full Stack Developer",
-    image: "hrishi.png",
+    image: "/hrishi.png",
     phone: "+91 8766204806",
     email: "24cs2018@rgipt.ac.in",
     linkedin: "https://linkedin.com/in/hrishirajchowdhury/",
@@ -14,7 +14,7 @@ const team = [
   {
     name: "Omika Singh",
     role: "Data Engineer",
-    image: "Omika.png",
+    image: "/Omika.png",
     phone: "+91 8950084550",
     email: "24pp3005@rgipt.ac.in",
     linkedin: "https://www.linkedin.com/in/omikasingh/",
@@ -23,7 +23,7 @@ const team = [
   {
     name: "Poorva Srivastava",
     role: "UI/UX Designer",
-    image: "poorva.png",
+    image: "/poorva.png",
     phone: "+91 9140933837",
     email: "24ce3043@rgipt.ac.in",
     linkedin: "https://www.linkedin.com/in/poorva-srivastava/",
@@ -32,7 +32,7 @@ const team = [
   {
     name: "Prasun Kumar",
     role: "ML Engineer",
-    image: "prasun .png",
+    image: "/prasun.png",
     phone: "+91 8252711971",
     email: "24cs2029@rgipt.ac.in",
     linkedin: "https://www.linkedin.com/in/prasun-kumar-kp2813/",
