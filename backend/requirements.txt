@@ -13,3 +13,4 @@ pandas
 python-dotenv
 httpx
 slowapi
+email-validator
