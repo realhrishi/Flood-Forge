@@ -9,6 +9,7 @@ import "leaflet/dist/leaflet.css";
 const FloodMap = () => {
 
   const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+  console.log("API KEY:", import.meta.env.VITE_OPENWEATHER_API_KEY);
 
   const [activeTab, setActiveTab] = useState("24h");
   const [radarLayer, setRadarLayer] = useState("precipitation_new");
@@ -274,40 +275,25 @@ const FloodMap = () => {
 
         <div className="absolute top-4 right-4 z-[1000] bg-black/70 p-2 rounded-lg flex gap-2 text-xs text-white">
 
-          <button
-            className="px-2 py-1 hover:bg-cyan-500/30 rounded"
-            onClick={() => setRadarLayer("precipitation_new")}
-          >
-            Precip
-          </button>
-
-          <button
-            className="px-2 py-1 hover:bg-cyan-500/30 rounded"
-            onClick={() => setRadarLayer("clouds_new")}
-          >
-            Clouds
-          </button>
-
-          <button
-            className="px-2 py-1 hover:bg-cyan-500/30 rounded"
-            onClick={() => setRadarLayer("rain")}
-          >
-            Rain
-          </button>
-
-          <button
-            className="px-2 py-1 hover:bg-cyan-500/30 rounded"
-            onClick={() => setRadarLayer("pressure_new")}
-          >
-            Pressure
-          </button>
-
-          <button
-            className="px-2 py-1 hover:bg-cyan-500/30 rounded"
-            onClick={() => setRadarLayer("temp_new")}
-          >
-            Temp
-          </button>
+          {[
+            { label: "Precip", value: "precipitation_new" },
+            { label: "Clouds", value: "clouds_new" },
+            { label: "Rain",   value: "rain_new" },
+            { label: "Pressure", value: "pressure_new" },
+            { label: "Temp",   value: "temp_new" },
+          ].map(({ label, value }) => (
+            <button
+              key={value}
+              className={`px-2 py-1 rounded transition-colors ${
+                radarLayer === value
+                  ? "bg-cyan-500 text-black font-bold"
+                  : "hover:bg-cyan-500/30"
+              }`}
+              onClick={() => setRadarLayer(value)}
+            >
+              {label}
+            </button>
+          ))}
 
         </div>
 
@@ -322,6 +308,7 @@ const FloodMap = () => {
           />
 
           <TileLayer
+            key={radarLayer}
             url={`https://tile.openweathermap.org/map/${radarLayer}/{z}/{x}/{y}.png?appid=${API_KEY}`}
             opacity={0.35}
           />

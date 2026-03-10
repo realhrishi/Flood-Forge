@@ -14,3 +14,4 @@ python-dotenv
 httpx
 slowapi
 email-validator
+gdown

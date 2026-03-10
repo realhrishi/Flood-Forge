@@ -8,7 +8,7 @@ import pickle
 import joblib
 import numpy as np
 import logging
-import requests
+import gdown
 
 logger = logging.getLogger(__name__)
 
@@ -36,27 +36,21 @@ DRIVE_FILES = {
 }
 
 
+def _is_valid_pkl(path: str) -> bool:
+    """Check file is real pkl, not an HTML error page from Drive."""
+    try:
+        with open(path, "rb") as f:
+            header = f.read(4)
+        return header[:1] == b'\x80' or header[:2] == b'PK'
+    except Exception:
+        return False
+
+
 def _download_from_drive(file_id: str, dest_path: str):
-    """Downloads from Drive, handling large-file virus-scan confirmation."""
-    session = requests.Session()
-    url = "https://drive.google.com/uc?export=download"
-
-    response = session.get(url, params={"id": file_id}, stream=True)
-
-    # Large files (>40MB) return a warning page with a confirm token
-    token = next(
-        (v for k, v in response.cookies.items() if k.startswith("download_warning")),
-        None
-    )
-    if token:
-        response = session.get(url, params={"id": file_id, "confirm": token}, stream=True)
-
+    """Downloads from Drive using gdown — handles large files automatically."""
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-    with open(dest_path, "wb") as f:
-        for chunk in response.iter_content(chunk_size=32768):
-            if chunk:
-                f.write(chunk)
-
+    url = f"https://drive.google.com/uc?id={file_id}"
+    gdown.download(url, dest_path, quiet=False, fuzzy=True)
     size_mb = os.path.getsize(dest_path) / (1024 * 1024)
     logger.info(f"Downloaded {os.path.basename(dest_path)} ({size_mb:.1f} MB)")
 
@@ -65,8 +59,12 @@ def _ensure_models_downloaded():
     """Downloads any missing model files from Google Drive."""
     for dest_path, file_id in DRIVE_FILES.items():
         if os.path.exists(dest_path):
-            logger.info(f"{os.path.basename(dest_path)} already exists, skipping.")
-            continue
+            if _is_valid_pkl(dest_path):
+                logger.info(f"{os.path.basename(dest_path)} already exists, skipping.")
+                continue
+            else:
+                logger.warning(f"{os.path.basename(dest_path)} is corrupted (HTML?), re-downloading...")
+                os.remove(dest_path)
         if file_id.startswith("PASTE_"):
             logger.warning(f"No Drive ID set for {os.path.basename(dest_path)} — skipping.")
             continue
