@@ -8,6 +8,7 @@ import pickle
 import joblib
 import numpy as np
 import logging
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,58 @@ DISTRICT_ENC_PATH = os.path.join(_DIR, "district_encoder.pkl")
 # ── Weights for soft-voting ensemble ──
 XGB_WEIGHT = 0.3
 RF_WEIGHT  = 0.7
+
+# ── Google Drive file IDs ──────────────────────────────────────
+# Upload each .pkl to Drive → Share → "Anyone with the link"
+# Extract FILE_ID from: https://drive.google.com/file/d/FILE_ID/view
+# ──────────────────────────────────────────────────────────────
+DRIVE_FILES = {
+    XGB_PATH:          "1YXc_GCPQfM_wC5DYBKiI439989VkYBnN",
+    RF_PATH:           "1Xoo9qXlnWU6wvjE0Msw10TQ2ZlV4subc",
+    STATE_ENC_PATH:    "1iCA9kNtY1hDULQfCr8N1h4o66JuguUQo",
+    DISTRICT_ENC_PATH: "1R3pyi_TSgAjb48_GufAs5VBjj1g16by2",
+}
+
+
+def _download_from_drive(file_id: str, dest_path: str):
+    """Downloads from Drive, handling large-file virus-scan confirmation."""
+    session = requests.Session()
+    url = "https://drive.google.com/uc?export=download"
+
+    response = session.get(url, params={"id": file_id}, stream=True)
+
+    # Large files (>40MB) return a warning page with a confirm token
+    token = next(
+        (v for k, v in response.cookies.items() if k.startswith("download_warning")),
+        None
+    )
+    if token:
+        response = session.get(url, params={"id": file_id, "confirm": token}, stream=True)
+
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    with open(dest_path, "wb") as f:
+        for chunk in response.iter_content(chunk_size=32768):
+            if chunk:
+                f.write(chunk)
+
+    size_mb = os.path.getsize(dest_path) / (1024 * 1024)
+    logger.info(f"Downloaded {os.path.basename(dest_path)} ({size_mb:.1f} MB)")
+
+
+def _ensure_models_downloaded():
+    """Downloads any missing model files from Google Drive."""
+    for dest_path, file_id in DRIVE_FILES.items():
+        if os.path.exists(dest_path):
+            logger.info(f"{os.path.basename(dest_path)} already exists, skipping.")
+            continue
+        if file_id.startswith("PASTE_"):
+            logger.warning(f"No Drive ID set for {os.path.basename(dest_path)} — skipping.")
+            continue
+        logger.info(f"Downloading {os.path.basename(dest_path)} from Google Drive...")
+        try:
+            _download_from_drive(file_id, dest_path)
+        except Exception as e:
+            logger.error(f"Failed to download {os.path.basename(dest_path)}: {e}")
 
 
 def _load_pkl(path: str, name: str):
@@ -53,9 +106,12 @@ def _load_pkl(path: str, name: str):
 def load_model() -> dict:
     """
     Load all model artifacts.
+    Downloads from Google Drive if not present locally.
     Returns a dict with keys: xgb, rf, state_enc, district_enc
     Any missing model gracefully falls back to rule-based prediction.
     """
+    _ensure_models_downloaded()
+
     bundle = {
         "xgb":          _load_pkl(XGB_PATH,          "XGBoost model"),
         "rf":           _load_pkl(RF_PATH,            "Random Forest model"),
